@@ -10,7 +10,7 @@ const PhoneNumberEditor = () => {
 
   const fetchNumber = () => {
     setLoading(true);
-    axios.get('https://mern-gcye.vercel.app/api/number')
+    axios.get('https://mern-kuni.vercel.app/api/number')
       .then(res => {
         setNumber(res.data.number || '');
         setInput(res.data.number || '');
@@ -27,7 +27,7 @@ const PhoneNumberEditor = () => {
   }, []);
 
   const handleUpdate = () => {
-    axios.put('http://localhost:3000/api/number', { number: input })
+    axios.put('https://mern-kuni.vercel.app/api/number', { number: input })
       .then(() => {
         setSuccess('Number updated!');
         setNumber(input);
