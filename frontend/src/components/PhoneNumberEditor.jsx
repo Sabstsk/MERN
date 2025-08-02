@@ -10,7 +10,7 @@ const PhoneNumberEditor = () => {
 
   const fetchNumber = () => {
     setLoading(true);
-    axios.get('http://localhost:3000/api/number')
+    axios.get('https://mern-gcye.vercel.app/api/number')
       .then(res => {
         setNumber(res.data.number || '');
         setInput(res.data.number || '');
