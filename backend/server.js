@@ -18,6 +18,11 @@ app.use(express.json());
 const messagesPath = path.join(__dirname, 'messages.json');
 const numberPath = path.join(__dirname, 'number.json');
 
+// Root route – show "Server ready" in browser
+app.get('/', (req, res) => {
+  res.send('✅ Server ready');
+});
+
 // Messages endpoints
 app.get('/api/messages', (req, res) => {
   fs.readFile(messagesPath, 'utf-8', (err, data) => {
