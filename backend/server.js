@@ -1,10 +1,24 @@
 import express from 'express';
 import cors from 'cors';
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+
+import Message from './models/Message.js';
+import NumberModel from './models/Number.js';
+
 dotenv.config();
+
+// 🔗 MongoDB Connection
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/messages';
+
+mongoose.connect(MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,63 +29,96 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-const messagesPath = path.join(__dirname, 'messages.json');
-const numberPath = path.join(__dirname, 'number.json');
-
-// Root route – show "Server ready" in browser
+// ✅ Root check
 app.get('/', (req, res) => {
   res.send('✅ Server ready');
 });
 
-// Messages endpoints
-app.get('/api/messages', (req, res) => {
-  fs.readFile(messagesPath, 'utf-8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Failed to read messages.' });
-    const parsed = JSON.parse(data);
-    res.json(parsed.messages || []);
-  });
+//
+// 📩 Message Endpoints
+//
+app.get('/api/messages', async (req, res) => {
+  try {
+    const messages = await Message.find().sort({ date: -1 }); // ➡️ Updated to sort by 'date'
+    res.json(messages);
+  } catch (err) {
+    console.error('GET /api/messages error:', err);
+    res.status(500).json({ error: 'Failed to fetch messages.' });
+  }
 });
 
-app.post('/api/messages', (req, res) => {
-  const newMsg = req.body;
-  fs.readFile(messagesPath, 'utf-8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Failed to read messages.' });
-    let parsed = JSON.parse(data);
-    if (!Array.isArray(parsed.messages)) parsed.messages = [];
-    parsed.messages.push(newMsg);
-    fs.writeFile(messagesPath, JSON.stringify(parsed, null, 2), err2 => {
-      if (err2) return res.status(500).json({ error: 'Failed to write messages.' });
-      res.json({ success: true });
-    });
-  });
+app.post('/api/messages', async (req, res) => {
+  try {
+    // ➡️ Updated to destructure the new fields from the request body
+    const { id, sender, message, date, sim_number, sim_slot } = req.body;
+    
+    // ➡️ Created a new message with the updated fields
+    const newMsg = new Message({ id, sender, message, date, sim_number, sim_slot });
+    
+    await newMsg.save();
+    res.json({ success: true, message: newMsg });
+  } catch (err) {
+    console.error('POST /api/messages error:', err);
+    res.status(500).json({ error: 'Failed to save message.' });
+  }
 });
 
-// Number endpoints
-app.get('/api/number', (req, res) => {
-  fs.readFile(numberPath, 'utf-8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Failed to read number.' });
-    res.json(JSON.parse(data));
-  });
+//
+// 📱 Number Endpoints
+//
+app.get('/api/number', async (req, res) => {
+  try {
+    let numberDoc = await NumberModel.findOne();
+    if (!numberDoc) {
+      numberDoc = await NumberModel.create({ number: '' });
+    }
+    // ➡️ Updated line: Send only the 'number' property.
+    res.json(numberDoc.number);
+  } catch (err) {
+    console.error('GET /api/number error:', err);
+    res.status(500).json({ error: 'Failed to fetch number.' });
+  }
 });
 
-app.put('/api/number', (req, res) => {
-  const { number } = req.body;
-  const newObj = { number };
-  fs.writeFile(numberPath, JSON.stringify(newObj, null, 2), err => {
-    if (err) return res.status(500).json({ error: 'Failed to update number.' });
+
+app.put('/api/number', async (req, res) => {
+  try {
+    const { number } = req.body;
+    let numberDoc = await NumberModel.findOne();
+
+    if (!numberDoc) {
+      numberDoc = new NumberModel({ number });
+    } else {
+      numberDoc.number = number;
+      numberDoc.updatedAt = Date.now();
+    }
+
+    await numberDoc.save();
+    res.json({ success: true, number: numberDoc });
+  } catch (err) {
+    console.error('PUT /api/number error:', err);
+    res.status(500).json({ error: 'Failed to update number.' });
+  }
+});
+
+app.delete('/api/number', async (req, res) => {
+  try {
+    const numberDoc = await NumberModel.findOne();
+    if (numberDoc) {
+      numberDoc.number = '';
+      numberDoc.updatedAt = Date.now();
+      await numberDoc.save();
+    }
     res.json({ success: true });
-  });
+  } catch (err) {
+    console.error('DELETE /api/number error:', err);
+    res.status(500).json({ error: 'Failed to clear number.' });
+  }
 });
 
-app.delete('/api/number', (req, res) => {
-  const newObj = { number: '' };
-  fs.writeFile(numberPath, JSON.stringify(newObj, null, 2), err => {
-    if (err) return res.status(500).json({ error: 'Failed to clear number.' });
-    res.json({ success: true });
-  });
-});
-
-// Serve frontend in production
+//
+// 🌐 Serve Frontend in Production
+//
 if (process.env.NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, '../frontend/dist');
   app.use(express.static(buildPath));
@@ -81,5 +128,5 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.listen(PORT, () => {
-  console.log(`Backend server running on port ${PORT}`);
+  console.log(`🚀 Backend server running at http://localhost:${PORT}`);
 });

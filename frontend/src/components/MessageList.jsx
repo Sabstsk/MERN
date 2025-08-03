@@ -7,13 +7,23 @@ const MessageList = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get('/api/messages')
+    const apiUrl = import.meta.env.VITE_API_URL;
+    axios.get(`${apiUrl}/api/messages`)
       .then(res => {
-        setMessages(Array.isArray(res.data) ? res.data : []);
+        // The server now directly sends an array of messages, not an object with a 'messages' key
+        if (Array.isArray(res.data)) {
+          setMessages(res.data);
+        } else {
+          setMessages([]);
+        }
         setLoading(false);
       })
-      .catch(() => {
-        setError('Failed to fetch messages');
+      .catch(err => {
+        let msg = 'Failed to fetch messages';
+        if (err.response && err.response.data && err.response.data.message) {
+          msg = err.response.data.message;
+        }
+        setError(msg);
         setLoading(false);
       });
   }, []);
@@ -27,14 +37,18 @@ const MessageList = () => {
       <h2 className="text-lg font-bold mb-2">Messages</h2>
       <ul className="space-y-2">
         {messages.map((msg) => (
-          <li key={msg.id || Math.random()} className="border-b last:border-b-0 pb-2">
+          <li key={msg._id} className="border-b last:border-b-0 pb-2">
             <div className="flex flex-col gap-1">
-              <div className="font-semibold text-blue-700">{msg.sender || msg.from || 'Unknown Sender'}</div>
-              <div className="whitespace-pre-line text-gray-800">{msg.message || msg.text || ''}</div>
-              <div className="text-xs text-gray-500 flex gap-2">
-                <span>{msg.date || msg.time || ''}</span>
-                {msg.sim_number && <span>SIM: {msg.sim_number}</span>}
-                {msg.sim_slot && <span>Slot: {msg.sim_slot}</span>}
+              {/* ➡️ Updated to use 'sender' */}
+              <div className="font-semibold text-blue-700">{msg.sender || 'Unknown Sender'}</div>
+              {/* ➡️ Updated to use 'message' */}
+              <div className="whitespace-pre-line text-gray-800">{msg.message || ''}</div>
+              <div className="text-xs text-gray-500">
+                {/* ➡️ Updated to use 'date' */}
+                <span>{new Date(msg.date).toLocaleString()}</span>
+                {/* ➡️ Updated to use 'sim_number' and 'sim_slot' */}
+                {msg.sim_number && <span className="ml-2">SIM Number: {msg.sim_number}</span>}
+                {msg.sim_slot && <span className="ml-2">SIM Slot: {msg.sim_slot}</span>}
               </div>
             </div>
           </li>

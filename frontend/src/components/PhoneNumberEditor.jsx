@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+// Use import.meta.env for Vite-based projects
+const API_URL = import.meta.env.VITE_API_URL;
+
 const PhoneNumberEditor = () => {
   const [number, setNumber] = useState('');
   const [input, setInput] = useState('');
@@ -8,17 +11,25 @@ const PhoneNumberEditor = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState('');
 
+  // ✅ Fetch function updated
   const fetchNumber = () => {
     setLoading(true);
-    axios.get('https://mern-kuni.vercel.app/api/number')
+    // ➡️ Fixed: Corrected API endpoint to '/api/number'
+    axios.get(`${API_URL}/api/number`)
       .then(res => {
-        setNumber(res.data.number || '');
-        setInput(res.data.number || '');
+        // ➡️ Updated: Access res.data directly, as it is now a string.
+        const fetchedNumber = res.data || '';
+        setNumber(fetchedNumber);
+        setInput(fetchedNumber);
         setLoading(false);
       })
-      .catch(() => {
-        setError('Failed to fetch number');
+      .catch(err => {
+        const msg = (err.response?.data?.message) || 'Failed to fetch number';
+        setError(msg);
+        setNumber('');
+        setInput('');
         setLoading(false);
+        setTimeout(() => setError(''), 2500);
       });
   };
 
@@ -26,33 +37,53 @@ const PhoneNumberEditor = () => {
     fetchNumber();
   }, []);
 
-  const handleUpdate = () => {
-    axios.put('https://mern-kuni.vercel.app/api/number', { number: input })
-      .then(() => {
+  // ✅ Update function is working correctly
+  const handleUpdate = async () => {
+    try {
+      const response = await axios.put(`${API_URL}/api/number`, { number: input });
+      if (response.data.success) {
         setSuccess('Number updated!');
         setNumber(input);
         setTimeout(() => setSuccess(''), 2000);
-      })
-      .catch(() => setError('Failed to update number'));
+      } else {
+        const msg = response.data.message || 'Update failed: Unknown error';
+        setError(msg);
+        setTimeout(() => setError(''), 2500);
+      }
+    } catch (error) {
+      const msg = (error.response?.data?.message) || 'Failed to update number';
+      setError(msg);
+      setTimeout(() => setError(''), 2500);
+    }
   };
 
+  // ✅ Delete function updated
   const handleDelete = () => {
-    axios.delete('http://localhost:3000/api/number')
-      .then(() => {
-        setSuccess('Number deleted!');
-        setNumber('');
-        setInput('');
+    axios.delete(`${API_URL}/api/number`)
+      .then(res => {
+        // ➡️ Fixed: The backend sends a 'success' property, not a 'message'.
+        if (res.data.success) {
+          setSuccess('Number deleted!');
+          setNumber('');
+          setInput('');
+        } else {
+          setError('Delete failed: ' + (res.data.message || 'Unknown error'));
+        }
         setTimeout(() => setSuccess(''), 2000);
       })
-      .catch(() => setError('Failed to delete number'));
+      .catch(err => {
+        const msg = (err.response?.data?.message) || 'Failed to delete number';
+        setError(msg);
+        setTimeout(() => setError(''), 2500);
+      });
   };
 
   if (loading) return <div className="text-center">Loading number...</div>;
-  if (error) return <div className="text-center text-red-500">{error}</div>;
 
   return (
     <div className="bg-white rounded shadow p-4">
       <h2 className="text-lg font-bold mb-2">Phone Number</h2>
+      {error && <div className="text-red-500 mb-2">{error}</div>}
       <input
         className="border px-2 py-1 rounded mr-2"
         value={input}
