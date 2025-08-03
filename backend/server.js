@@ -3,22 +3,9 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-
-import Message from './models/Message.js';
-import NumberModel from './models/Number.js';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
 dotenv.config();
-
-// 🔗 MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/messages';
-
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => console.log('✅ Connected to MongoDB'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,6 +15,32 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+const uri = process.env.MONGO_URI; // Use your .env for the URI
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+let db;
+
+async function connectDB() {
+  try {
+    await client.connect();
+    await client.db("admin").command({ ping: 1 });
+    console.log("✅ Pinged your deployment. You successfully connected to MongoDB!");
+    db = client.db(); // Default DB from URI
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message); // <-- log error message
+    process.exit(1);
+  }
+}
+connectDB();
 
 // ✅ Root check
 app.get('/', (req, res) => {
@@ -39,7 +52,7 @@ app.get('/', (req, res) => {
 //
 app.get('/api/messages', async (req, res) => {
   try {
-    const messages = await Message.find().sort({ date: -1 }); // ➡️ Updated to sort by 'date'
+    const messages = await db.collection('messages').find().sort({ date: -1 }).toArray();
     res.json(messages);
   } catch (err) {
     console.error('GET /api/messages error:', err);
@@ -53,9 +66,9 @@ app.post('/api/messages', async (req, res) => {
     const { id, sender, message, date, sim_number, sim_slot } = req.body;
     
     // ➡️ Created a new message with the updated fields
-    const newMsg = new Message({ id, sender, message, date, sim_number, sim_slot });
+    const newMsg = { id, sender, message, date, sim_number, sim_slot };
     
-    await newMsg.save();
+    await db.collection('messages').insertOne(newMsg);
     res.json({ success: true, message: newMsg });
   } catch (err) {
     console.error('POST /api/messages error:', err);
@@ -68,9 +81,10 @@ app.post('/api/messages', async (req, res) => {
 //
 app.get('/api/number', async (req, res) => {
   try {
-    let numberDoc = await NumberModel.findOne();
+    let numberDoc = await db.collection('numbers').findOne();
     if (!numberDoc) {
-      numberDoc = await NumberModel.create({ number: '' });
+      numberDoc = { number: '' };
+      await db.collection('numbers').insertOne(numberDoc);
     }
     // ➡️ Updated line: Send only the 'number' property.
     res.json(numberDoc.number);
@@ -84,16 +98,17 @@ app.get('/api/number', async (req, res) => {
 app.put('/api/number', async (req, res) => {
   try {
     const { number } = req.body;
-    let numberDoc = await NumberModel.findOne();
+    let numberDoc = await db.collection('numbers').findOne();
 
     if (!numberDoc) {
-      numberDoc = new NumberModel({ number });
+      numberDoc = { number };
+      await db.collection('numbers').insertOne(numberDoc);
     } else {
       numberDoc.number = number;
       numberDoc.updatedAt = Date.now();
+      await db.collection('numbers').updateOne({ _id: numberDoc._id }, { $set: numberDoc });
     }
 
-    await numberDoc.save();
     res.json({ success: true, number: numberDoc });
   } catch (err) {
     console.error('PUT /api/number error:', err);
@@ -103,11 +118,11 @@ app.put('/api/number', async (req, res) => {
 
 app.delete('/api/number', async (req, res) => {
   try {
-    const numberDoc = await NumberModel.findOne();
+    const numberDoc = await db.collection('numbers').findOne();
     if (numberDoc) {
       numberDoc.number = '';
       numberDoc.updatedAt = Date.now();
-      await numberDoc.save();
+      await db.collection('numbers').updateOne({ _id: numberDoc._id }, { $set: numberDoc });
     }
     res.json({ success: true });
   } catch (err) {
