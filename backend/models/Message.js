@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema({
-  id: Number,
   sender: String,
   message: String,
   date: Date,
