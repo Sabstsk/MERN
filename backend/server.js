@@ -35,8 +35,13 @@ async function connectDB() {
     await client.db("admin").command({ ping: 1 });
     console.log("✅ Pinged your deployment. You successfully connected to MongoDB!");
     db = client.db(); // Default DB from URI
+
+    // Start server only after DB is connected
+    app.listen(PORT, () => {
+      console.log(`🚀 Backend server running at http://localhost:${PORT}`);
+    });
   } catch (err) {
-    console.error('❌ MongoDB connection error:', err.message); // <-- log error message
+    console.error('❌ MongoDB connection error:', err);
     process.exit(1);
   }
 }
@@ -141,7 +146,3 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(buildPath, 'index.html'));
   });
 }
-
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running at http://localhost:${PORT}`);
-});
