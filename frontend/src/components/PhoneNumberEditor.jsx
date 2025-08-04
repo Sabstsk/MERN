@@ -115,7 +115,7 @@ const PhoneNumberEditor = () => {
 
   return (
     <motion.div 
-      className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-xl border border-gray-200"
+      className="w-full max-w-md mx-auto p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -147,8 +147,8 @@ const PhoneNumberEditor = () => {
         )}
       </AnimatePresence>
 
-      <div className="flex items-center gap-3 mb-4">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
+        <div className="relative w-full sm:flex-1">
           <input
             type="tel"
             value={input}
@@ -164,7 +164,7 @@ const PhoneNumberEditor = () => {
           disabled={isUpdating || isDeleting}
           className={clsx(
             buttonBaseClasses,
-            'bg-blue-600 hover:bg-blue-700',
+            'bg-blue-600 hover:bg-blue-700 w-full sm:w-auto',
             (isUpdating || isDeleting) && 'opacity-60 cursor-not-allowed'
           )}
           whileHover={{ scale: (isUpdating || isDeleting) ? 1 : 1.05 }}
@@ -178,7 +178,7 @@ const PhoneNumberEditor = () => {
           disabled={isUpdating || isDeleting || !number}
           className={clsx(
             buttonBaseClasses,
-            'bg-red-500 hover:bg-red-600 px-3',
+            'bg-red-500 hover:bg-red-600 px-4 w-full sm:w-auto flex items-center justify-center gap-2',
             (isUpdating || isDeleting || !number) && 'opacity-60 cursor-not-allowed'
           )}
           title="Delete number"
@@ -186,6 +186,7 @@ const PhoneNumberEditor = () => {
           whileTap={{ scale: (isUpdating || isDeleting || !number) ? 1 : 0.95 }}
         >
           <TrashIcon className="h-5 w-5" />
+          <span>Delete</span>
         </motion.button>
       </div>
 

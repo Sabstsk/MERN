@@ -41,6 +41,38 @@ body, html, #root {
   min-height: 100vh;
 }
 
+@media (max-width: 640px) {
+  .dashboard-main {
+    flex-direction: row;
+  }
+  .dashboard-content {
+    margin-left: 64px !important;
+    padding: 1rem 0.5rem;
+  }
+  .motion-nav, .admin-sidebar, nav {
+    width: 64px !important;
+    min-width: 56px !important;
+    max-width: 72px !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+    align-items: center !important;
+  }
+  .motion-nav span:not(.text-xl):not(.h-5):not(.w-5),
+  .admin-sidebar span:not(.text-xl):not(.h-5):not(.w-5),
+  nav span:not(.text-xl):not(.h-5):not(.w-5) {
+    display: none !important;
+  }
+  .admin-logo, .admin-user {
+    display: none !important;
+  }
+  .nav-btn {
+    gap: 0 !important;
+    justify-content: center !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+  }
+}
+
 .admin-sidebar {
   width: 240px;
   height: 100vh;
@@ -354,9 +386,7 @@ body, html, #root {
   }
 }
 
-.card {
-  padding: 2em;
-}
+
 
 .read-the-docs {
   color: #888;

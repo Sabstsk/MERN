@@ -93,11 +93,11 @@ const PasswordChange = () => {
   const iconClasses = "absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none";
 
   return (
-    <div className="min-h-[400px] w-full max-w-md mx-auto p-8 bg-white/60 backdrop-blur-md rounded-3xl shadow-2xl border border-gray-200 relative overflow-hidden">
+    <div className="min-h-[400px] w-full max-w-md mx-auto p-4 sm:p-8 my-4 sm:my-8 bg-white/60 backdrop-blur-md rounded-3xl shadow-2xl border border-gray-200 relative overflow-hidden">
       <div className="absolute inset-0 bg-blue-100 opacity-30 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
       
       <motion.h2
-        className="text-3xl font-bold text-center text-gray-800 mb-8 tracking-tight"
+        className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6 sm:mb-8 tracking-tight"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}

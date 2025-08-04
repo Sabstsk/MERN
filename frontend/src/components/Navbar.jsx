@@ -41,7 +41,7 @@ const Navbar = ({ section, setSection, user, onLogout }) => {
       transition={{ type: "spring", stiffness: 100 }}
     >
       <div className="flex items-center gap-2 mb-6 px-2">
-        <span className="text-xl font-bold text-gray-800 tracking-tight">AdminPanel</span>
+        <span className="text-xl font-bold text-gray-800 tracking-tight hidden sm:inline">AdminPanel</span>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -65,7 +65,7 @@ const Navbar = ({ section, setSection, user, onLogout }) => {
             whileTap={{ scale: 0.98 }}
           >
             <span className="text-xl">{item.icon}</span>
-            <span>{item.name}</span>
+            <span className="hidden sm:inline">{item.name}</span>
             
             {/* Notification Badge */}
             {item.key === 'messages' && hasNewMessages && section !== 'messages' && (
@@ -84,18 +84,18 @@ const Navbar = ({ section, setSection, user, onLogout }) => {
       </div>
 
       <div className="mt-auto pt-6 border-t border-gray-100">
-        <div className="flex items-center gap-2 mb-2 px-2 text-gray-700">
+        <div className="flex items-center gap-2 mb-2 px-2 text-gray-700 hidden sm:flex">
           <span className="text-sm">Welcome,</span>
           <b className="font-semibold">{user}</b>
         </div>
         <motion.button
           onClick={onLogout}
-          className="w-full flex items-center gap-2 px-4 py-3 rounded-lg font-medium text-white bg-red-500 hover:bg-red-600 transition-colors duration-200"
+          className="w-full flex items-center justify-center sm:justify-start gap-2 px-4 py-3 rounded-lg font-medium text-white bg-red-500 hover:bg-red-600 transition-colors duration-200"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           <ArrowRightOnRectangleIcon className="h-5 w-5" />
-          <span>Logout</span>
+          <span className="hidden sm:inline">Logout</span>
         </motion.button>
       </div>
     </motion.nav>

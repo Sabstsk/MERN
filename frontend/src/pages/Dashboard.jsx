@@ -41,7 +41,7 @@ const Dashboard = ({ user, onLogout }) => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Navbar section={section} setSection={setSection} user={user} onLogout={onLogout} />
-      <main className="flex-1 overflow-auto p-8">
+      <main className="flex-1 overflow-auto py-8">
         <AnimatePresence mode="wait">
           {section === 'dashboard' && <DashboardWelcome key="dashboard-welcome" />}
           {section === 'messages' && (
