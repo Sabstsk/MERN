@@ -1,40 +1,53 @@
 import React, { useState } from 'react';
 
 const Login = ({ onLogin }) => {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simple hardcoded check (replace with real auth as needed)
-    if (username === 'admin' && password === 'password') {
-      onLogin(username);
-    } else {
-      setError('Invalid username or password');
+    setError('');
+    try {
+      const response = await fetch(`${apiUrl}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await response.json();
+      if (response.ok && data.token) {
+        localStorage.setItem('token', data.token);
+        onLogin(username); // Optionally pass token
+      } else {
+        setError(data.error || 'Login failed');
+      }
+    } catch (err) {
+      setError('Network error');
     }
   };
 
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow w-full max-w-xs">
-        <h2 className="text-lg font-bold mb-4 text-center">Login</h2>
-        {error && <div className="text-red-500 mb-2 text-center">{error}</div>}
+    <div className="login-bg">
+      <form onSubmit={handleSubmit} className="login-card">
+        <h2 className="login-title">Login</h2>
+        {error && <div className="login-error">{error}</div>}
         <input
           type="text"
           placeholder="Username"
-          className="w-full mb-2 px-3 py-2 border rounded"
           value={username}
           onChange={e => setUsername(e.target.value)}
+          required
         />
         <input
           type="password"
           placeholder="Password"
-          className="w-full mb-4 px-3 py-2 border rounded"
           value={password}
           onChange={e => setPassword(e.target.value)}
+          required
         />
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Login</button>
+        <button type="submit" className="login-btn">Login</button>
       </form>
     </div>
   );

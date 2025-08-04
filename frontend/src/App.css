@@ -1,9 +1,315 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+body, html, #root {
+  height: 100vh;
+  min-height: 100vh;
+  min-width: 100vw;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Roboto', Arial, sans-serif;
+  background: #f3f4f6;
+  overflow: hidden;
 }
+
+
+
+.login-bg {
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80') no-repeat center center fixed;
+  background-size: cover;
+}
+
+
+.login-card {
+  background: rgba(255,255,255,0.85);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.13);
+  padding: 2.5rem 2rem;
+  max-width: 350px;
+  width: 100%;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.dashboard-main {
+  display: flex;
+  height: 100vh;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  width: 240px;
+  height: 100vh;
+  background: #23272f;
+  color: #f3f4f6;
+  box-shadow: 2px 0 16px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 2.2rem 1.1rem 1.2rem 1.1rem;
+  gap: 2px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 2.5rem 2.5rem;
+  min-width: 0;
+  background: #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  height: 100vh;
+  box-sizing: border-box;
+  margin-left: 240px;
+  overflow-y: auto;
+}
+
+.admin-logo {
+  font-weight: 800;
+  font-size: 1.45rem;
+  letter-spacing: 1px;
+  margin-bottom: 2.5rem;
+  color: #60a5fa;
+  text-align: left;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  font-size: 1.08rem;
+  text-align: left;
+  padding: 0.62rem 1.1rem 0.62rem 0.9rem;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  transition: background 0.16s, color 0.16s;
+}
+.nav-btn.active, .nav-btn:hover {
+  background: #6366f1;
+  color: #fff;
+}
+.nav-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.admin-user {
+  font-size: 15px;
+  color: #a0aec0;
+  margin-bottom: 10px;
+  margin-top: 1.5rem;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 2.5rem 2.5rem;
+  min-width: 0;
+  background: #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+
+
+.dashboard-content {
+  flex: 1;
+  padding: 2.5rem 1rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: #374151;
+  font-size: 1.08rem;
+  text-align: left;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.16s, color 0.16s;
+}
+.nav-btn.active, .nav-btn:hover {
+  background: #6366f1;
+  color: #fff;
+}
+
+.solid-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.08);
+  padding: 2rem 1.5rem;
+  max-width: 480px;
+  width: 100%;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+
+.login-card input {
+  border: none;
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  font-size: 1rem;
+  background: rgba(255,255,255,0.6);
+  margin-bottom: 0.5rem;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.login-card input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #6366f1;
+}
+
+.login-btn {
+  background: linear-gradient(90deg, #6366f1 0%, #60a5fa 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.12);
+  transition: background 0.2s, transform 0.15s;
+}
+
+.login-btn:hover {
+  background: linear-gradient(90deg, #60a5fa 0%, #6366f1 100%);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.login-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2d3748;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
+}
+
+.login-error {
+  color: #ef4444;
+  background: #fee2e2;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* MessageList styles */
+.message-list-card {
+  position: relative;
+}
+
+.floating-delete-all {
+  position: fixed;
+  right: 36px;
+  bottom: 36px;
+  z-index: 1002;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px 0 rgba(31,38,135,0.13);
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: background 0.15s, box-shadow 0.15s;
+  padding: 0;
+}
+.floating-delete-all:hover {
+  background: #dc2626;
+  box-shadow: 0 8px 24px 0 rgba(31,38,135,0.18);
+}
+
+
+.message-list {
+  background: rgba(255,255,255,0.85);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.15);
+  padding: 2rem 1.2rem;
+  max-width: 600px;
+  width: 100%;
+  margin: 2rem auto;
+}
+
+.message-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 0;
+}
+
+.message-content {
+  flex: 1;
+  text-align: left;
+  color: #22223b;
+  font-size: 1.08rem;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(239,68,68,0.18);
+  transition: background 0.15s, transform 0.15s;
+}
+.delete-btn:hover {
+  background: #dc2626;
+  transform: scale(1.08);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: rgba(0,0,0,0.05);
+}
+::-webkit-scrollbar-thumb {
+  background: #6366f1;
+  border-radius: 8px;
+}
+
 
 .logo {
   height: 6em;
@@ -24,6 +330,21 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
