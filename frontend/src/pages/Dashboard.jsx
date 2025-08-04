@@ -46,7 +46,9 @@ const Dashboard = ({ user, onLogout }) => {
           {section === 'dashboard' && <DashboardWelcome key="dashboard-welcome" />}
           {section === 'messages' && (
             <motion.div key="messages-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full max-w-4xl mx-auto">
-              <MessageList />
+              <div className="w-full max-h-[90vh] overflow-y-auto">
+                <MessageList />
+              </div>
             </motion.div>
           )}
           {section === 'number' && (
