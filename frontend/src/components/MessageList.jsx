@@ -187,48 +187,6 @@ const MessageList = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <h2 className="login-title" style={{ margin: 0 }}>Messages</h2>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <button 
-              onClick={testNotification}
-              style={{
-                background: '#10b981',
-                color: 'white',
-                border: 'none',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                fontSize: '12px',
-                cursor: 'pointer'
-              }}
-            >
-              Test Notification
-            </button>
-            <button 
-              onClick={simulateNewMessage}
-              style={{
-                background: '#f59e0b',
-                color: 'white',
-                border: 'none',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                fontSize: '12px',
-                cursor: 'pointer'
-              }}
-            >
-              +1 Message
-            </button>
-            <button 
-              onClick={simulateMultipleMessages}
-              style={{
-                background: '#8b5cf6',
-                color: 'white',
-                border: 'none',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                fontSize: '12px',
-                cursor: 'pointer'
-              }}
-            >
-              +3 Messages
-            </button>
             <div style={{ 
               background: '#3b82f6', 
               color: 'white', 

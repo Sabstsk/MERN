@@ -7,6 +7,7 @@ import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb';
 import jwt from 'jsonwebtoken';
 import apiKeyAuth from './middleware/apiKeyAuth.js';
 import auth from './middleware/auth.js';
+import User from './models/User.js';
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -30,6 +31,7 @@ const client = new MongoClient(uri, {
 });
 
 let db;
+let userModel;
 
 async function connectDB() {
   try {
@@ -37,6 +39,20 @@ async function connectDB() {
     await client.db("admin").command({ ping: 1 });
     console.log("✅ Pinged your deployment. You successfully connected to MongoDB!");
     db = client.db(); // Default DB from URI
+    
+    // Initialize User model
+    userModel = new User(db);
+    
+    // Create default admin user if it doesn't exist
+    try {
+      const existingUser = await userModel.findByUsername('admin');
+      if (!existingUser) {
+        await userModel.create({ username: 'admin', password: 'admin123' });
+        console.log('✅ Default admin user created (username: admin, password: admin123)');
+      }
+    } catch (err) {
+      console.log('ℹ️ Default user already exists or creation skipped');
+    }
 
     // Start server only after DB is connected
     app.listen(PORT, () => {
@@ -54,16 +70,53 @@ app.get('/', (req, res) => {
   res.send('✅ Server ready');
 });
 
-// 🔑 Login route for JWT token
-app.post('/api/login', (req, res) => {
+// 🔑 Login route for JWT token (DB version)
+app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
-  const adminUser = process.env.ADMIN_USER;
-  const adminPass = process.env.ADMIN_PASS;
-  if (username === adminUser && password === adminPass) {
+  try {
+    const user = await userModel.findByUsername(username);
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    // Plain text password comparison as requested
+    if (user.password !== password) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
     const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    return res.json({ token });
+    res.json({ token, username });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
-  res.status(401).json({ error: 'Invalid credentials' });
+});
+
+// 🔒 Update password endpoint (auth required)
+app.put('/api/update-password', auth, async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) {
+    return res.status(400).json({ error: 'Old and new password required.' });
+  }
+  try {
+    const username = req.user.username;
+    const user = await userModel.findByUsername(username);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+    // Plain text password comparison as requested
+    if (user.password !== oldPassword) {
+      return res.status(401).json({ error: 'Old password is incorrect.' });
+    }
+    // Update password in plain text as requested
+    const updated = await userModel.updatePassword(username, newPassword);
+    if (updated) {
+      res.json({ success: true, message: 'Password updated successfully.' });
+    } else {
+      res.status(500).json({ error: 'Failed to update password.' });
+    }
+  } catch (err) {
+    console.error('Update password error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 //

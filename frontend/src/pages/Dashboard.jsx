@@ -1,48 +1,65 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import MessageList from '../components/MessageList';
 import PhoneNumberEditor from '../components/PhoneNumberEditor';
+import PasswordChange from '../components/PasswordChange';
 import Navbar from '../components/Navbar';
-import Card from '../components/Card';
 import notificationService from '../services/NotificationService';
+import { Squares2X2Icon, HandRaisedIcon } from '@heroicons/react/24/outline';
 
 const Dashboard = ({ user, onLogout }) => {
   const [section, setSection] = useState('dashboard');
 
-  // Start global notification service when Dashboard mounts
   useEffect(() => {
     notificationService.start();
-    
-    // Cleanup when Dashboard unmounts
     return () => {
       notificationService.stop();
     };
   }, []);
 
+  const DashboardWelcome = () => (
+    <motion.div
+      key="dashboard"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      transition={{ duration: 0.4 }}
+      className="w-full max-w-xl mx-auto flex items-center justify-center p-4"
+    >
+      <div className="p-8 bg-white rounded-2xl shadow-xl border border-gray-100 text-center">
+        <div className="flex justify-center mb-4">
+          <HandRaisedIcon className="h-16 w-16 text-blue-500" />
+        </div>
+        <h2 className="text-3xl font-bold mb-2 text-gray-800">Welcome, {user}!</h2>
+        <p className="text-gray-600 mt-4">
+          This is your admin panel. Use the sidebar on the left to navigate and manage different sections.
+        </p>
+      </div>
+    </motion.div>
+  );
+
   return (
-    <div className="dashboard-main">
+    <div className="flex min-h-screen bg-gray-100">
       <Navbar section={section} setSection={setSection} user={user} onLogout={onLogout} />
-      <main className="dashboard-content">
-        {section === 'dashboard' && (
-          <Card style={{ textAlign: 'center', maxWidth: 480, margin: '0 auto' }}>
-            <h2 className="login-title">Welcome to Dashboard</h2>
-            <p style={{ fontSize: '1.15rem', color: '#555', margin: '1.2rem 0 0.5rem' }}>
-              This is your admin dashboard. Use the sidebar to manage messages, phone numbers, and your account.
-            </p>
-          </Card>
-        )}
-        {section === 'messages' && <MessageList />}
-        {section === 'number' && (
-          <Card style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
-            <PhoneNumberEditor />
-          </Card>
-        )}
-        {section === 'password' && (
-          <Card style={{ textAlign: 'center', maxWidth: 480, margin: '0 auto' }}>
-            <h2 className="login-title">Change Password</h2>
-            <p style={{ color: '#666', marginBottom: 16 }}>This section will allow you to change your password. (Feature coming soon!)</p>
-            {/* Add your password change form here if needed */}
-          </Card>
-        )}
+      <main className="flex-1 overflow-auto p-8">
+        <AnimatePresence mode="wait">
+          {section === 'dashboard' && <DashboardWelcome key="dashboard-welcome" />}
+          {section === 'messages' && (
+            <motion.div key="messages-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full max-w-4xl mx-auto">
+              <MessageList />
+            </motion.div>
+          )}
+          {section === 'number' && (
+            <motion.div key="number-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full max-w-lg mx-auto">
+              <PhoneNumberEditor />
+            </motion.div>
+          )}
+          {section === 'password' && (
+            <motion.div key="password-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full max-w-lg mx-auto">
+              <PasswordChange />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );
